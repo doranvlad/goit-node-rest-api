@@ -2,64 +2,77 @@ import path from "path";
 import { v4 as uuidv4 } from "uuid";
 import fs from "fs/promises";
 
-const contactsPath = path.join(process.cwd(), "db", "contacts.json");
+import Movie from "../models/Contact.js";
 
-export async function listContacts() {
-  try {
-    const data = await fs.readFile(contactsPath);
-    return JSON.parse(data);
-  } catch (error) {
-    throw new Error("Unable to read contacts file.");
-  }
-}
+export const listContacts = () => Movie.find();
 
-export async function getContactById(contactId) {
-  const allContacts = await listContacts();
+export const getContactById = (contactId) => Movie.findById(contactId);
 
-  const contact = allContacts.find((contact) => contact.id === contactId);
+export const updateContactById = (contactId, update, options) =>
+  Movie.findByIdAndUpdate(contactId, update, options);
 
-  return contact || null;
-}
+export const removeContact = (contactId) => Movie.findByIdAndDelete(contactId);
 
-export async function removeContact(contactId) {
-  const allContacts = await listContacts();
+export const addContact = (data) => Movie.create(data);
 
-  const findContactIndex = allContacts.findIndex(
-    (contact) => contact.id === contactId
-  );
+// const contactsPath = path.join(process.cwd(), "db", "contacts.json");
 
-  if (findContactIndex === -1) {
-    return null;
-  }
+// export async function removeContact(contactId) {
+//   const allContacts = await listContacts();
 
-  const removedContact = allContacts[findContactIndex];
+//   const findContactIndex = allContacts.findIndex(
+//     (contact) => contact.id === contactId
+//   );
 
-  allContacts.splice(findContactIndex, 1);
+//   if (findContactIndex === -1) {
+//     return null;
+//   }
 
-  fs.writeFile(contactsPath, JSON.stringify(allContacts, null, 2));
+//   const removedContact = allContacts[findContactIndex];
 
-  return removedContact;
-}
+//   allContacts.splice(findContactIndex, 1);
 
-export async function addContact(data) {
-  const allContacts = await listContacts();
-  const id = uuidv4();
+//   fs.writeFile(contactsPath, JSON.stringify(allContacts, null, 2));
 
-  allContacts.push({ id, ...data });
+//   return removedContact;
+// }
 
-  fs.writeFile(contactsPath, JSON.stringify(allContacts, null, 2));
+// export async function addContact(data) {
+//   const allContacts = await listContacts();
+//   const id = uuidv4();
 
-  return allContacts[allContacts.length - 1];
-}
+//   allContacts.push({ id, ...data });
 
-export async function updateContactById(id, data) {
-  const allContacts = await listContacts();
-  const index = allContacts.findIndex((item) => item.id === id);
-  if (index === -1) {
-    return null;
-  }
-  allContacts[index] = { ...allContacts[index], ...data };
-  fs.writeFile(contactsPath, JSON.stringify(allContacts, null, 2));
+//   fs.writeFile(contactsPath, JSON.stringify(allContacts, null, 2));
 
-  return allContacts[index];
-}
+//   return allContacts[allContacts.length - 1];
+// }
+
+// export async function updateContactById(id, data) {
+//   const allContacts = await listContacts();
+//   const index = allContacts.findIndex((item) => item.id === id);
+//   if (index === -1) {
+//     return null;
+//   }
+//   allContacts[index] = { ...allContacts[index], ...data };
+//   fs.writeFile(contactsPath, JSON.stringify(allContacts, null, 2));
+
+//   return allContacts[index];
+// }
+
+// export async function listContacts() {
+//   try {
+//     const data = await fs.readFile(contactsPath);
+//     return JSON.parse(data);
+//   } catch (error) {
+//     throw new Error("Unable to read contacts file.");
+//   }
+// }
+
+// export async function getContactById(contactId) {
+//   const allContacts = await listContacts();
+
+//   const contact = allContacts.find((contact) => contact.id === contactId);
+
+//   return contact || null;
+// }

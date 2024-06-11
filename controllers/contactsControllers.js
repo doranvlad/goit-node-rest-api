@@ -73,7 +73,10 @@ export const updateContact = async (req, res, next) => {
     }
 
     const { id } = req.params;
-    const result = await updateContactById(id, req.body);
+    const result = await updateContactById(id, req.body, {
+      new: true,
+      runValidators: true,
+    });
 
     if (!result) {
       throw HttpError(404);
