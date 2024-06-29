@@ -9,12 +9,14 @@ import {
 import authControllers from "../controllers/authControllers.js";
 import authenticate from "../middlewares/authenticate.js";
 import upload from "../middlewares/upload.js";
+import resizeAvatar from "../middlewares/resizeAvatar.js";
 
 const authRouter = express.Router();
 
 authRouter.post(
   "/register",
   upload.single("avatar"),
+  resizeAvatar,
   isEmptyBody,
   validateBody(authRegisterSchema),
   authControllers.register
@@ -35,6 +37,7 @@ authRouter.patch(
   "/avatars",
   authenticate,
   upload.single("avatar"),
+  resizeAvatar,
   authControllers.updateAvatar
 );
 
