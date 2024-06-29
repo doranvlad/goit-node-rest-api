@@ -1,5 +1,6 @@
 import multer from "multer";
 import path from "path";
+import gravatar from "gravatar";
 
 import HttpError from "../helpers/HttpError.js";
 
@@ -8,8 +9,12 @@ const destination = path.resolve("tmp");
 const storage = multer.diskStorage({
   destination,
   filename: (req, file, callback) => {
-    const uniquePreffix = `${Date.now()}_${Math.round(Math.random() * 1e9)}`;
-    const filename = `${uniquePreffix}_${file.originalname}`;
+    const extention = file.originalname.split(".").pop();
+    const email = req.body.email || req.user.email;
+    const filename =
+      gravatar.url(email).replace("//www.gravatar.com/avatar/", "") +
+      "." +
+      extention;
     callback(null, filename);
   },
 });
