@@ -8,11 +8,15 @@ import {
 } from "../schemas/authSchemas.js";
 import authControllers from "../controllers/authControllers.js";
 import authenticate from "../middlewares/authenticate.js";
+import upload from "../middlewares/upload.js";
+import resizeAvatar from "../middlewares/resizeAvatar.js";
 
 const authRouter = express.Router();
 
 authRouter.post(
   "/register",
+  upload.single("avatar"),
+  resizeAvatar,
   isEmptyBody,
   validateBody(authRegisterSchema),
   authControllers.register
@@ -28,5 +32,13 @@ authRouter.post(
 authRouter.post("/logout", authenticate, authControllers.logout);
 
 authRouter.get("/current", authenticate, authControllers.getCurrent);
+
+authRouter.patch(
+  "/avatars",
+  authenticate,
+  upload.single("avatar"),
+  resizeAvatar,
+  authControllers.updateAvatar
+);
 
 export default authRouter;

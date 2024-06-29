@@ -1,3 +1,6 @@
+import fs from "fs/promises";
+import path from "path";
+
 import {
   addContact,
   getContactById,
@@ -11,6 +14,8 @@ import {
   createContactSchema,
   updateContactSchema,
 } from "../schemas/contactsSchemas.js";
+
+const avatarsDir = path.resolve("public", "avatars");
 
 export const getAllContacts = async (req, res, next) => {
   try {

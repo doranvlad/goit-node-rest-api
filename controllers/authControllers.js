@@ -1,4 +1,6 @@
 import bcrypt from "bcrypt";
+import fs from "fs/promises";
+import path from "path";
 
 import * as authServices from "../services/authServices.js";
 
@@ -7,6 +9,8 @@ import ctrlWrapper from "../decorators/ctrlWrapper.js";
 import HttpError from "../helpers/HttpError.js";
 
 import { createToken } from "../helpers/jwt.js";
+
+const avatarsDir = path.resolve("public", "avatars");
 
 const register = async (req, res) => {
   const { email, password } = req.body;
@@ -18,9 +22,15 @@ const register = async (req, res) => {
 
   const hashPassword = await bcrypt.hash(password, 10);
 
+  const { path: oldPath, filename } = req.file;
+  const newPath = path.join(avatarsDir, filename);
+  await fs.rename(oldPath, newPath);
+  const avatar = path.join("avatars", filename);
+
   const newUser = await authServices.register({
     ...req.body,
     password: hashPassword,
+    avatarURL: avatar,
   });
 
   res.status(201).json({
@@ -32,7 +42,7 @@ const register = async (req, res) => {
 const login = async (req, res) => {
   const { email, password } = req.body;
   const user = await authServices.findUser({ email });
-  console.log(user);
+
   if (!user) {
     throw HttpError(401, "Email or password is wrong");
   }
@@ -76,9 +86,26 @@ const getCurrent = (req, res) => {
   });
 };
 
+const updateAvatar = async (req, res) => {
+  const { email, subscription } = req.user;
+
+  const { path: oldPath, filename } = req.file;
+  const newPath = path.join(avatarsDir, filename);
+  await fs.rename(oldPath, newPath);
+  const avatar = path.join("avatars", filename);
+
+  const { _id } = req.user;
+  await authServices.updateUser({ _id }, { avatarURL: avatar });
+
+  res.json({
+    avatarURL: avatar,
+  });
+};
+
 export default {
   register: ctrlWrapper(register),
   login: ctrlWrapper(login),
   logout: ctrlWrapper(logout),
   getCurrent: ctrlWrapper(getCurrent),
+  updateAvatar: ctrlWrapper(updateAvatar),
 };
