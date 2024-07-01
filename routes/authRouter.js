@@ -5,6 +5,7 @@ import validateBody from "../decorators/validateBody.js";
 import {
   authRegisterSchema,
   authSigninSchema,
+  authEmailSchema,
 } from "../schemas/authSchemas.js";
 import authControllers from "../controllers/authControllers.js";
 import authenticate from "../middlewares/authenticate.js";
@@ -27,6 +28,15 @@ authRouter.post(
   isEmptyBody,
   validateBody(authSigninSchema),
   authControllers.login
+);
+
+authRouter.get("/verify/:verificationToken", authControllers.verify);
+
+authRouter.post(
+  "/verify",
+  isEmptyBody,
+  validateBody(authEmailSchema),
+  authControllers.resendEmail
 );
 
 authRouter.post("/logout", authenticate, authControllers.logout);
